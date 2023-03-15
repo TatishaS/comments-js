@@ -1,0 +1,68 @@
+.comment {
+  margin-bottom: 3rem;
+
+  &__header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 0.8rem;
+  }
+
+  &__name {
+    font-weight: 700;
+  }
+
+  &__date {
+    color: $darkgrey-text;
+    opacity: 0.8;
+  }
+
+  &__divider {
+    display: block;
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: #989898;
+    margin-left: 1.2rem;
+    margin-right: 1.2rem;
+  }
+
+  &__content {
+    margin-bottom: 1.2rem;
+  }
+
+  &__delete-btn {
+    display: inline-block;
+    margin-left: 1.6rem;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    outline: none;
+  }
+  &__delete-btn:focus {
+    box-shadow: 0 0 0 0.6rem $lightgrey-text;
+  }
+
+  &__like-icon {
+    pointer-events: none;
+  }
+
+  /* hide radio inputs */
+  &__like-input {
+    display: none;
+  }
+
+  &__like-label {
+    padding: 0 0.2rem 0 0.2rem;
+  }
+
+  /* set default star color */
+  &__like-icon {
+    fill: $lightgrey-text;
+  }
+
+  /* if any input is checked, make its following siblings grey  */
+  &__like-input:checked ~ .comment__like-label .comment__like-icon {
+    fill: crimson;
+  }
+}

@@ -180,21 +180,21 @@ const renderAlertMessage = (elem, text) => {
   span.innerText = text;
   elem.appendChild(span);
   //span.insertAdjacentHTML('beforeend', html);
-
-  inputName.addEventListener('change', () => {
-    console.log('меняется');
-    if (!span) return;
-    else span.remove();
-  });
 };
 
-const clearAlert = input => {};
-
-/* inputName.addEventListener('input', () => {
+const clearAlert = e => {
   console.log('меняется');
-}); */
+  const target = e.target;
+  if (target.nextElementSibling) {
+    target.nextElementSibling.remove();
+  }
+};
 
-form.addEventListener('submit', event => {
+inputName.addEventListener('input', e => clearAlert(e));
+
+inputTextarea.addEventListener('input', e => clearAlert(e));
+
+const handleFormSubmit = e => {
   event.preventDefault();
 
   const name = inputName.value;
@@ -202,14 +202,17 @@ form.addEventListener('submit', event => {
   const date = inputDate.value ? inputDate.valueAsNumber : Date.now();
 
   if (!name) {
-    renderAlertMessage(nameField, 'Заполните имя!');
-
-    return;
+    inputName.parentElement.insertAdjacentHTML(
+      'beforeend',
+      `<span class="alert">Заполните имя</span>`
+    );
   }
 
   if (!content) {
-    console.log(textareaField);
-    renderAlertMessage(textareaField, 'Заполните поле комментария!');
+    inputTextarea.parentElement.insertAdjacentHTML(
+      'beforeend',
+      `<span class="alert">Заполните поля комментария</span>`
+    );
   }
 
   if (name && content) {
@@ -224,4 +227,9 @@ form.addEventListener('submit', event => {
 
     clearInputs();
   }
+};
+
+form.addEventListener('submit', event => handleFormSubmit(event));
+document.addEventListener('keyup', e => {
+  if (event.code === 'Enter') handleFormSubmit(event);
 });

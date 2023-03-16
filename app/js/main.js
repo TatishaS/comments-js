@@ -14,30 +14,34 @@ const commentDate = document.querySelector('.comment__date');
 
 /* Comments array */
 
-let comments = [
+/* let comments = [
   {
+    id: 1678812066210,
     name: 'Раиса',
     content: 'Первый коммент',
     date: 1678812066210,
   },
   {
+    id: 1678812066890,
     name: 'Федор',
     content: 'Второй',
     date: 1678812066890,
   },
   {
+    id: 1648822656775,
     name: 'Заяц',
     content: 'Третий коммент',
     date: 1648822656775,
   },
   {
+    id: 1678802656775,
     name: 'Волк',
     content: 'Четвертый коммент',
     date: 1678802656775,
   },
-];
+]; */
 
-//let comments = [];
+let comments = [];
 
 /* Helpers */
 
@@ -82,6 +86,7 @@ const formatDate = date => {
 const createComment = obj => {
   const item = document.createElement('li');
   item.classList.add('comment');
+  item.setAttribute('id', obj.id);
 
   let html = '';
 
@@ -91,7 +96,6 @@ const createComment = obj => {
   }
 
   if (obj) {
-    //commentsInner.innerHTML = '';
     html = `
   <div class="comment__wrapper">
                     <div class="comment__header">
@@ -148,10 +152,10 @@ const createComment = obj => {
 const renderComments = items => {
   console.log(items);
   commentsList.textContent = '';
-  if (items.length === 0) {
+  /*   if (items.length === 0) {
     commentsInner.innerHTML =
       '<p style="font-style: italic">Комментариев еще нет</p>';
-  }
+  } */
 
   items
     ?.sort((a, b) => b.date - a.date)
@@ -182,21 +186,42 @@ const renderAlertMessage = (elem, text) => {
   //span.insertAdjacentHTML('beforeend', html);
 };
 
-const clearAlert = e => {
+const clearAlert = event => {
   console.log('меняется');
-  const target = e.target;
+  const target = event.target;
   if (target.nextElementSibling) {
     target.nextElementSibling.remove();
   }
 };
 
-inputName.addEventListener('input', e => clearAlert(e));
+const deleteComment = event => {
+  console.log(event.target);
+  const btn = event.target.closest('.comment__delete-btn');
 
-inputTextarea.addEventListener('input', e => clearAlert(e));
+  if (!btn) return;
 
-const handleFormSubmit = e => {
+  const parent = event.target.closest('.comment');
+
+  // Определяем ID задачи
+  const id = +parent.id;
+
+  // Удаляем задча через фильтрацию массива
+  comments = comments.filter(comment => comment.id !== id);
+
+  // Сохраняем список задач в хранилище браузера localStorage
+  //saveToLocalStorage();
+
+  // Удаляем задачу из разметки
+  parent.remove();
+};
+
+inputName.addEventListener('input', event => clearAlert(event));
+
+inputTextarea.addEventListener('input', event => clearAlert(event));
+
+const handleFormSubmit = event => {
   event.preventDefault();
-
+  const id = Date.now();
   const name = inputName.value;
   const content = inputTextarea.value;
   const date = inputDate.value ? inputDate.valueAsNumber : Date.now();
@@ -217,6 +242,7 @@ const handleFormSubmit = e => {
 
   if (name && content) {
     const formInfo = {
+      id,
       name,
       content,
       date,
@@ -230,6 +256,8 @@ const handleFormSubmit = e => {
 };
 
 form.addEventListener('submit', event => handleFormSubmit(event));
-document.addEventListener('keyup', e => {
+document.addEventListener('keyup', event => {
   if (event.code === 'Enter') handleFormSubmit(event);
 });
+
+commentsList.addEventListener('click', deleteComment);

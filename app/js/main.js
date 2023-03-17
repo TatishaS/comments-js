@@ -9,7 +9,6 @@ const commentsInner = document.querySelector('.comments__inner');
 const nameField = document.getElementById('name-field');
 const textareaField = document.getElementById('textarea-field');
 const commentsList = document.getElementById('comments-list');
-
 const commentDate = document.querySelector('.comment__date');
 
 /* Comments array */
@@ -44,44 +43,6 @@ const commentDate = document.querySelector('.comment__date');
 let comments = [];
 
 /* Helpers */
-
-const dateOptions = {
-  month: 'long',
-  day: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit',
-};
-
-const patternDay = 1678812066210;
-
-const formatDate = date => {
-  const calcDaysPassed = (date1, date2) =>
-    Math.round(Math.abs(date2 - date1) / (1000 * 60 * 60 * 24));
-  const daysPassed = calcDaysPassed(new Date(), date);
-
-  if (daysPassed === 0) {
-    const time = new Intl.DateTimeFormat('ru-RU', {
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(date);
-    console.log(`сегодня, ${time}`);
-
-    return `сегодня, ${time}`;
-  }
-
-  if (daysPassed === 1) {
-    const time = new Intl.DateTimeFormat('ru-RU', {
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(date);
-    return `вчера, ${time}`;
-  }
-  const formatedDate = new Intl.DateTimeFormat('ru-RU', dateOptions).format(
-    date
-  );
-
-  return formatedDate;
-};
 
 const createComment = obj => {
   const item = document.createElement('li');
@@ -149,13 +110,21 @@ const createComment = obj => {
   return item;
 };
 
+const checkEmptyComments = () => {
+  if (comments.length === 0) {
+    const emptyComments = `<p style="font-style: italic" id="empty-comments">Комментариев еще нет</p>`;
+    commentsInner.insertAdjacentHTML('afterbegin', emptyComments);
+  }
+
+  if (comments.length > 0) {
+    const emptyCommentsEl = document.querySelector('#empty-comments');
+    emptyCommentsEl ? emptyCommentsEl.remove() : null;
+  }
+};
 const renderComments = items => {
   console.log(items);
   commentsList.textContent = '';
-  /*   if (items.length === 0) {
-    commentsInner.innerHTML =
-      '<p style="font-style: italic">Комментариев еще нет</p>';
-  } */
+  checkEmptyComments();
 
   items
     ?.sort((a, b) => b.date - a.date)
@@ -165,59 +134,17 @@ const renderComments = items => {
     });
 };
 
-const clearInputs = () => {
-  inputName.value = '';
-  inputTextarea.value = '';
-  inputDate.value = '';
-};
-
-formatDate(1678812066210);
-renderComments(comments);
-
-const renderAlertMessage = (elem, text) => {
-  let html = '';
-
-  let span = document.createElement('span');
-  span.classList.add('alert');
-  console.log(span);
-  html = text;
-  span.innerText = text;
-  elem.appendChild(span);
-  //span.insertAdjacentHTML('beforeend', html);
-};
-
-const clearAlert = event => {
-  console.log('меняется');
-  const target = event.target;
-  if (target.nextElementSibling) {
-    target.nextElementSibling.remove();
-  }
-};
-
 const deleteComment = event => {
-  console.log(event.target);
   const btn = event.target.closest('.comment__delete-btn');
 
   if (!btn) return;
 
   const parent = event.target.closest('.comment');
-
-  // Определяем ID задачи
   const id = +parent.id;
-
-  // Удаляем задча через фильтрацию массива
   comments = comments.filter(comment => comment.id !== id);
-
-  // Сохраняем список задач в хранилище браузера localStorage
-  //saveToLocalStorage();
-
-  // Удаляем задачу из разметки
   parent.remove();
+  checkEmptyComments();
 };
-
-inputName.addEventListener('input', event => clearAlert(event));
-
-inputTextarea.addEventListener('input', event => clearAlert(event));
 
 const handleFormSubmit = event => {
   event.preventDefault();
@@ -255,9 +182,71 @@ const handleFormSubmit = event => {
   }
 };
 
+/* Helpers */
+
+const dateOptions = {
+  month: 'long',
+  day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+};
+
+const formatDate = date => {
+  const calcDaysPassed = (date1, date2) =>
+    Math.round(Math.abs(date2 - date1) / (1000 * 60 * 60 * 24));
+  const daysPassed = calcDaysPassed(new Date(), date);
+
+  if (daysPassed === 0) {
+    const time = new Intl.DateTimeFormat('ru-RU', {
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
+    return `сегодня, ${time}`;
+  }
+
+  if (daysPassed === 1) {
+    const time = new Intl.DateTimeFormat('ru-RU', {
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
+    return `вчера, ${time}`;
+  }
+  const formatedDate = new Intl.DateTimeFormat('ru-RU', dateOptions).format(
+    date
+  );
+
+  return formatedDate;
+};
+
+const clearInputs = () => {
+  inputName.value = '';
+  inputTextarea.value = '';
+  inputDate.value = '';
+};
+
+const renderAlertMessage = (elem, text) => {
+  let html = '';
+
+  let span = document.createElement('span');
+  span.classList.add('alert');
+  html = text;
+  span.innerText = text;
+  elem.appendChild(span);
+};
+
+const clearAlert = event => {
+  const target = event.target;
+  if (target.nextElementSibling) {
+    target.nextElementSibling.remove();
+  }
+};
+
+/* Init  */
+renderComments(comments);
 form.addEventListener('submit', event => handleFormSubmit(event));
 document.addEventListener('keyup', event => {
   if (event.code === 'Enter') handleFormSubmit(event);
 });
-
 commentsList.addEventListener('click', deleteComment);
+inputName.addEventListener('input', event => clearAlert(event));
+inputTextarea.addEventListener('input', event => clearAlert(event));
